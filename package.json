@@ -1,12 +1,12 @@
 {
-  "name": "kopilica-api",
+  "name": "student_cv-api",
   "version": "0.0.1",
   "private": true,
-  "author": "ECP",
+  "author": "lpetrovhr",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/EastCoastProduct/api-skeleton"
+    "url": "https://github.com/lpetrovhr/diplomski-api.git"
   },
   "dependencies": {
     "babel-cli": "^6.24.1",
@@ -18,6 +18,7 @@
     "bluebird": "^3.5.0",
     "crypto-random-string": "^1.0.0",
     "dotenv-safe": "^4.0.4",
+    "jdenticon": "^1.7.2",
     "joi": "^10.6.0",
     "jsonwebtoken": "^7.4.1",
     "kcors": "^2.2.1",
@@ -34,6 +35,7 @@
     "lodash": "^4.17.4",
     "migratio": "^2.0.1",
     "minimist": "^1.2.0",
+    "moment": "^2.18.1",
     "nested-error-stacks": "^2.0.0",
     "npm-run-all": "^4.0.2",
     "pg-promise": "^6.3.5",

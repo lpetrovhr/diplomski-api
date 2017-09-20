@@ -12,6 +12,8 @@ app.use(require('middleware/error'))
 
 app.use(mount('/', require('route/index').routes()))
 app.use(mount('/', require('route/user').routes()))
+app.use(mount('/', require('route/student').routes()))
+app.use(mount('/', require('route/company').routes()))
 
 app.use(async function (ctx, next) {
   ctx.throw(404)

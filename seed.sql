@@ -1,4 +1,3 @@
-
 -- superadmin@mail.com/superadmin
 INSERT INTO
   "user" (email, password, address, zip_code, country_code)
@@ -6,7 +5,7 @@ INSERT INTO
 INSERT INTO
   user_role (user_id, role)
   VALUES (currval('user_id_seq'), 20);
-  
+
 -- student1@mail.com/student1
 INSERT INTO
   "user" (email, password, address, phone, zip_code, country_code)

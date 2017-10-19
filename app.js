@@ -16,8 +16,8 @@ app.use(mount('/', require('route/student').routes()))
 app.use(mount('/', require('route/company').routes()))
 
 app.use(async function (ctx, next) {
-  ctx.throw(404)
-  await next()
+	ctx.throw(404)
+	await next()
 })
 
 module.exports = app

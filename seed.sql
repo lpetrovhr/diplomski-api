@@ -1,3 +1,22 @@
+-- social
+INSERT INTO
+  social (id, name)
+  VALUES
+  (1, 'Facebook'),
+  (2, 'Twitter'),
+  (3, 'Github'),
+  (4, 'Instagram');
+
+-- categories
+INSERT INTO
+  category (id, name)
+  VALUES (1 ,'Informacijska Tehnologija'), (2 ,'Ekonomija'), (3 ,'Racunovodstvo'), (4, 'Elektrotehnika'), (5 ,'Strojarstvo');
+
+-- post type
+INSERT INTO
+  post_type (id ,name)
+  VALUES (1, 'Posao'), (2, 'Praksa'), (3, 'Radionica'), (4, 'Predavanje'), (5, 'Obavijest');
+
 -- superadmin@mail.com/superadmin
 INSERT INTO
   "user" (email, password, address, zip_code, country_code)
@@ -30,7 +49,7 @@ INSERT INTO
 
 -- student3@mail.com/student3
 INSERT INTO
-  "user" (email, password, address, phone, zip_code, country_code)
+  "user" (email,  password, address, phone, zip_code, country_code)
   VALUES ('student3@mail.com', '$2a$04$PfaNP5HyE4yLXtoBPG3bSeUnZ6enKJH4zPJWSPq7EPmSxbKIhOYDC', 'Trg marsala Tita 11', '099-444-6556', 10000, 'HR');
 INSERT INTO
   user_role (user_id, role)
@@ -48,7 +67,16 @@ INSERT INTO
   VALUES (currval('user_id_seq'), 10);
 INSERT INTO
   company(user_id, name, oib, info)
-  VALUES(currval('user_id_seq'), 'AwesomeIng', 12534456521, 'Block development company with funny name');
+  VALUES (currval('user_id_seq'), 'AwesomeIng', 12534456521, 'Block development company with funny name');
+INSERT INTO
+  post (company_id, type_id, info)
+  VALUES 
+  (currval('user_id_seq'), 5,  'Dragi studenti, ovim putem vas obavijestavamo da u subotu 13.8.2017. imamo dane otvorenih vrata te vas pozivamo da nam se pridruzite u sto vecem broju');
+INSERT INTO
+  post_category (post_id, category_id)
+  VALUES
+  (currval('post_id_seq'), 1),
+  (currval('post_id_seq'), 4);
 
 -- company2@mail.com/company2
 INSERT INTO
@@ -58,5 +86,17 @@ INSERT INTO
   user_role (user_id, role)
   VALUES (currval('user_id_seq'), 10);
 INSERT INTO
-  company(user_id, name, oib, info)
-  VALUES(currval('user_id_seq'), 'FiveRow', 44557753236, 'Greates company of them all, looking for awesome new hire');
+  company (user_id, name, oib, info)
+  VALUES (currval('user_id_seq'), 'FiveRow', 44557753236, 'Greates company of them all, looking for awesome new hire');
+INSERT INTO
+  post (company_id, type_id, info)
+  VALUES 
+  (currval('user_id_seq'), 2, 'Trazimo studenta za obavljanje strucne prakse'),
+  (currval('user_id_seq'), 4, 'U petak 22.5.2018. drzimo predavanje na temu asinkronih funkcija u JavaScript-u');
+INSERT INTO
+  post_category (post_id, category_id)
+  VALUES
+  (currval('post_id_seq'), 1),
+  (currval('post_id_seq'), 4);
+
+

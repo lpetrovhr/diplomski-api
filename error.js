@@ -6,12 +6,12 @@ const pgp = require('pg-promise')
 const errors = require('error.toml')
 
 class GenericError extends NestedError {
-  constructor (ec, cause, status) {
-    super(ec, cause)
-    this.error = ec
-    this.code = code(ec)
-    this.status = status
-  }
+	constructor (ec, cause, status) {
+		super(ec, cause)
+		this.error = ec
+		this.code = code(ec)
+		this.status = status
+	}
 }
 
 class DatabaseError extends GenericError {}
@@ -19,22 +19,22 @@ class HttpError extends GenericError {}
 class ValidationError extends GenericError {}
 
 function code (ec) {
-  const code = _.get(errors, ec)
-  assert(code, 'invalid error const specified')
-  return code
+	const code = _.get(errors, ec)
+	assert(code, 'invalid error const specified')
+	return code
 }
 
 function wrapper (ErrorClass, defaultStatus = 500) {
-  return function (ec, status = defaultStatus) {
-    return function handler (cause, nothrow = false) {
-      if (cause instanceof GenericError && !nothrow) {
-        throw cause
-      }
-      const err = new ErrorClass(ec, cause, status)
-      if (nothrow) return err
-      throw err
-    }
-  }
+	return function (ec, status = defaultStatus) {
+		return function handler (cause, nothrow = false) {
+			if (cause instanceof GenericError && !nothrow) {
+				throw cause
+			}
+			const err = new ErrorClass(ec, cause, status)
+			if (nothrow) return err
+			throw err
+		}
+	}
 }
 
 const error = wrapper(GenericError, 400)

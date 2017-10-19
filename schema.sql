@@ -60,6 +60,7 @@ CREATE TABLE social (
 CREATE TABLE user_social (
   user_id INTEGER NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
   social_id INTEGER NOT NULL REFERENCES social (id) ON DELETE CASCADE,
+  link TEXT NOT NULL,
   PRIMARY KEY (user_id, social_id)
 );
 

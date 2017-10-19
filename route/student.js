@@ -13,9 +13,13 @@ const validate = require('middleware/validate')
 router.use(responder)
 
 router.get('/students', async function (ctx) {
-	ctx.state.r = {
-		message: 'get all users',
-	}
+	ctx.state.r = await studentRepo.getAllStudents()
+})
+
+router.get('/students/:id', validate('param', {id: joi.number().integer().positive().required(), 
+}), async function (ctx) {
+	const {id} = ctx.v.param
+	ctx.state.r = await studentRepo.getStudentById(id)
 })
 
 module.exports = router

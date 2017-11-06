@@ -106,6 +106,23 @@ async function setRoleById (id, role) {
 	.catch(error.db('db.write'))
 }
 
+async function addUserCategoryById (user_id, category_id) {
+	return db.none(`
+		INSERT INTO user_category
+		VALUES ($[user_id], $[category_id])
+	`, {user_id, category_id})
+	.catch(error.db('db.write'))
+}
+
+async function removeUserCategoryById (user_id, category_id) {
+	return db.none(`
+		DELETE FROM user_category
+		WHERE user_id = $[user_id]
+		AND category_id = $[category_id]
+	`, {user_id, category_id})
+	.catch(error.db('db.delete'))
+}
+
 module.exports = {
 	create,
 	getByEmail,
@@ -115,4 +132,6 @@ module.exports = {
 	map,
 	setRoleById,
 	updatePassword,
+	addUserCategoryById,
+	removeUserCategoryById,
 }

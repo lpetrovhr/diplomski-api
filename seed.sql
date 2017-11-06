@@ -35,6 +35,12 @@ INSERT INTO
 INSERT INTO 
   student (user_id, first_name, last_name, cv_link)
   VALUES (currval('user_id_seq'), 'Leon', 'Petrov', 'nekakav_link_dotcom');
+INSERT INTO
+  user_category (user_id, category_id)
+  VALUES 
+  (currval('user_id_seq'), 1),
+  (currval('user_id_seq'), 2);
+
   
 -- student2@mail.com/student2
 INSERT INTO

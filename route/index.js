@@ -10,7 +10,6 @@ const responder = require('middleware/responder')
 router.use(responder)
 
 router.get('/', async function (ctx) {
-	console.log(3)
 	ctx.state.r = {
 		message: 'Successful get of the root',
 	}

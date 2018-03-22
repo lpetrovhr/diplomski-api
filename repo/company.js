@@ -21,7 +21,7 @@ const map = mapper({
   profilePicture: 'image_fname',
 })
 
-async function getAllCompanies() {
+async function getAllCompanies () {
 	return await db.any(`
 		SELECT * FROM "company"
 		INNER JOIN "user" ON ("company".user_id = "user".id)`)
@@ -29,12 +29,12 @@ async function getAllCompanies() {
 		.map(map)
 }
 
-async function getCompanyById(id) {
+async function getCompanyById (id) {
 	return await db.one(`
 		SELECT * FROM "company"
 		INNER JOIN "user" ON ("company".user_id = "user".id)
-		WHERE "company".user_id = $1
-		`, [id])
+		WHERE "company".user_id = $[1]
+		`, {id})
 		.catch(error.QueryResultError, error('user.not_found'))
 		.catch(error.db('db.read'))
 		.then(map)

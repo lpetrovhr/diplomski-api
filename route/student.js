@@ -16,7 +16,7 @@ router.get('/students', async function (ctx) {
 	ctx.state.r = await studentRepo.getAllStudents()
 })
 
-router.get('/students/:id', validate('param', {id: joi.number().integer().positive().required(), 
+router.get('/students/:id', validate('param', {id: joi.number().integer().positive().required(),
 }), async function (ctx) {
 	const {id} = ctx.v.param
 	ctx.state.r = await studentRepo.getStudentById(id)

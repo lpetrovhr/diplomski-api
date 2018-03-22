@@ -10,7 +10,6 @@ const map = mapper({
 	id: 'user_id',
 	email: 'email',
 	companyName: 'name',
-	picture: 'image_fname',
 	info: 'info',
 	active: 'active',
 	address: 'address',
@@ -19,6 +18,7 @@ const map = mapper({
 	zip: 'zip_code',
 	country: 'country_code',
 	createdAt: 'created_at',
+  profilePicture: 'image_fname',
 })
 
 async function getAllCompanies () {

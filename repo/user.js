@@ -1,26 +1,26 @@
-const _ = require('lodash')
-const assert = require('assert')
-const bcrypt = require('bcrypt')
+const _ = require('lodash');
+const assert = require('assert');
+const bcrypt = require('bcrypt');
 
-const consts = require('const')
-const error = require('error')
-const {db} = require('db')
-const {mapper} = require('repo/base')
+const consts = require('const');
+const error = require('error');
+const {db} = require('db');
+const {mapper} = require('repo/base');
 
 const map = mapper({
 	id: 'id',
 	createdAt: 'created_at',
 	email: 'email',
-})
+});
 
 async function hashPassword (password) {
 	return bcrypt.hash(password, _.toInteger(process.env.BCRYPT_ROUNDS))
-	.catch(error.db('user.password_invalid'))
+	.catch(error.db('user.password_invalid'));
 }
 
 async function checkPassword (password, hash) {
 	return bcrypt.compare(password, hash).then(assert)
-	.catch(error.AssertionError, error('user.password_wrong'))
+	.catch(error.AssertionError, error('user.password_wrong'));
 }
 
 async function create (email, password, firstName, lastName) {
@@ -37,9 +37,9 @@ async function create (email, password, firstName, lastName) {
 			password: password ? await hashPassword(password) : '',
 			role: consts.roleUser.none,
 		})
-		.catch({constraint: 'user_email_key'}, error('user.duplicate'))
+		.catch({constraint: 'user_email_key'}, error('user.duplicate'));
 	})
-	.catch(error.db('db.write'))
+	.catch(error.db('db.write'));
 }
 
 async function updatePassword (id, password) {
@@ -48,7 +48,7 @@ async function updatePassword (id, password) {
     SET password = $2
     WHERE id = $1
   `, [id, await hashPassword(password)])
-	.catch(error.db('db.update'))
+	.catch(error.db('db.update'));
 }
 
 async function getById (id) {
@@ -59,7 +59,7 @@ async function getById (id) {
   `, [id])
 	.then(map)
 	.catch(error.QueryResultError, error('user.not_found'))
-	.catch(error.db('db.read'))
+	.catch(error.db('db.read'));
 }
 
 async function getByEmail (email) {
@@ -70,7 +70,7 @@ async function getByEmail (email) {
   `, [email])
 	.catch(error.QueryResultError, error('user.not_found'))
 	.catch(error.db('db.read'))
-	.then(map)
+	.then(map);
 }
 
 async function getByEmailPassword (email, password) {
@@ -80,9 +80,9 @@ async function getByEmailPassword (email, password) {
     WHERE email = $1
   `, [email])
 	.catch(error.QueryResultError, error('user.password_wrong'))
-	.catch(error.db('db.read'))
-	await checkPassword(password, user.password)
-	return map(user)
+	.catch(error.db('db.read'));
+	await checkPassword(password, user.password);
+	return map(user);
 }
 
 async function getRoleById (id) {
@@ -93,7 +93,7 @@ async function getRoleById (id) {
   `, {id})
 	.catchReturn(error.QueryResultError, consts.roleUser.none)
 	.catch(error.db('db.read'))
-	.get('role')
+	.get('role');
 }
 
 async function setRoleById (id, role) {
@@ -103,7 +103,7 @@ async function setRoleById (id, role) {
     WHERE user_id = $[id]
   `, {id, role})
 	.catch({constraint: 'user_role_user_id_fkey'}, error.db('user.not_found'))
-	.catch(error.db('db.write'))
+	.catch(error.db('db.write'));
 }
 
 async function addUserCategoryById (user_id, category_id) {
@@ -111,7 +111,7 @@ async function addUserCategoryById (user_id, category_id) {
 		INSERT INTO user_category
 		VALUES ($[user_id], $[category_id])
 	`, {user_id, category_id})
-	.catch(error.db('db.write'))
+	.catch(error.db('db.write'));
 }
 
 async function removeUserCategoryById (user_id, category_id) {
@@ -120,7 +120,7 @@ async function removeUserCategoryById (user_id, category_id) {
 		WHERE user_id = $[user_id]
 		AND category_id = $[category_id]
 	`, {user_id, category_id})
-	.catch(error.db('db.delete'))
+	.catch(error.db('db.delete'));
 }
 
 module.exports = {
@@ -134,4 +134,4 @@ module.exports = {
 	updatePassword,
 	addUserCategoryById,
 	removeUserCategoryById,
-}
+};

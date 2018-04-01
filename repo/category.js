@@ -1,13 +1,13 @@
-const consts = require('const')
-const error = require('error')
-const {db} = require('db')
+const consts = require('const');
+const error = require('error');
+const {db} = require('db');
 
-const {mapper} = require('repo/base')
+const {mapper} = require('repo/base');
 
 const map = mapper({
 	categoryId: 'id',
 	categoryName: 'name',
-})
+});
 
 async function getUserCategoriesById (id) {
 	const category = await db.any(`
@@ -17,11 +17,11 @@ async function getUserCategoriesById (id) {
       WHERE user_id = $[id]
   `, {id})
 	.map(map)
-	.catch(error.db('db.read'))
+	.catch(error.db('db.read'));
 
-	return category
+	return category;
 }
 
 module.exports = {
 	getUserCategoriesById,
-}
+};

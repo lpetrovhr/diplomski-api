@@ -1,5 +1,4 @@
 [roleUser]
-none = 0
-student = 5
-admin = 10
-superadmin = 20
+student = 0
+company = 10
+admin = 20

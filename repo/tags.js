@@ -1,13 +1,13 @@
-const consts = require('const')
-const error = require('error')
-const {db} = require('db')
+const consts = require('const');
+const error = require('error');
+const {db} = require('db');
 
-const {mapper} = require('repo/base')
+const {mapper} = require('repo/base');
 
 const map = mapper({
 	tagId: 'id',
 	tagName: 'name',
-})
+});
 
 async function getUserTagsById (id) {
 	const tag = await db.any(`
@@ -17,11 +17,13 @@ async function getUserTagsById (id) {
       WHERE user_id = $[id]
   `, {id})
 	.map(map)
-	.catch(error.db('db.read'))
+	.catch(error.db('db.read'));
 
-	return tag
+	return tag;
 }
+
+// add / remove
 
 module.exports = {
 	getUserTagsById,
-}
+};

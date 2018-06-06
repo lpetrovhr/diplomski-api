@@ -9,16 +9,35 @@ const passwordTokenRepo = require('repo/passwordToken');
 const responder = require('middleware/responder');
 const roleUser = require('middleware/roleUser');
 const userRepo = require('repo/user');
+const socialRepo = require('repo/social');
 const validate = require('middleware/validate');
 
 router.use(responder);
 
-router.post('/register', validate('body', {
+router.post('/register/student', validate('body', {
 	email: joi.string().email().required(),
 	password: joi.string().min(8).required(),
+	address: joi.string().required(),
+	zipCode: joi.string().required(),
+	countryCode: joi.string().required(),
 }), async function (ctx) {
-	const {email, password} = ctx.v.body;
-	await userRepo.create(email, password);
+	const {email, password, address, zipCode, countryCode} = ctx.v.body;
+	await userRepo.createStudent(email, password, consts.roleUser.student, address, zipCode, countryCode);
+	ctx.state.r = await userRepo.getByEmail(email);
+});
+
+router.post('/register/company', validate('body', {
+	email: joi.string().email().required(),
+	password: joi.string().min(8).required(),
+	address: joi.string().required(),
+	zipCode: joi.string().required(),
+	countryCode: joi.string().required(),
+	companyName: joi.string().required(),
+	oib: joi.string().length(11).required(),
+	info: joi.string(),
+}), async function (ctx) {
+	const {email, password, address, zipCode, countryCode, companyName, oib, info} = ctx.v.body;
+	await userRepo.createCompany(email, password, consts.roleUser.company, address, zipCode, countryCode, companyName, oib, info);
 	ctx.state.r = await userRepo.getByEmail(email);
 });
 
@@ -87,6 +106,44 @@ router.post('/passwordchange', validate('body', {
 	const id = await passwordTokenRepo.get(token);
 	await userRepo.updatePassword(id, password);
 	await passwordTokenRepo.remove(id);
+	ctx.state.r = {};
+});
+
+router.post('/user/:id/social', validate('param', {
+	id: joi.number().integer().required(),
+}), validate('body', {
+	socialId: joi.number().integer().required(),
+	link: joi.string().required(),
+}), async function (ctx) {
+	const { id } = ctx.v.param;
+	const { socialId, link } = ctx.v.body;
+
+	await socialRepo.addUserSocial(id, socialId, link);
+	ctx.state.r = {};
+});
+
+router.put('/user/:id/social', validate('param', {
+	id: joi.number().integer().required(),
+}), validate('body', {
+	socialId: joi.number().integer().required(),
+	link: joi.string().required(),
+}), async function (ctx) {
+	const { id } = ctx.v.param;
+	const { socialId, link } = ctx.v.body;
+
+	await socialRepo.updateUserSocialById(id, socialId, link);
+	ctx.state.r = {};
+});
+
+router.delete('/user/:id/social', validate('param', {
+	id: joi.number().integer().required(),
+}), validate('body', {
+	socialId: joi.number().integer().required(),
+}), async function (ctx) {
+	const { id } = ctx.v.param;
+	const { socialId } = ctx.v.body;
+
+	await socialRepo.removeUserSocial(id, socialId);
 	ctx.state.r = {};
 });
 

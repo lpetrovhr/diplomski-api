@@ -22,6 +22,8 @@ async function getUserTagsById (id) {
 	return tag;
 }
 
+// add / remove
+
 module.exports = {
 	getUserTagsById,
 };

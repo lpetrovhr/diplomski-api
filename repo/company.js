@@ -24,6 +24,7 @@ const map = mapper({
 	country: 'country_code',
 	createdAt: 'created_at',
 	profilePicture: 'image_fname',
+	oib: 'oib',
 });
 
 async function getAllCompanies () {
@@ -51,7 +52,7 @@ async function getCompanyById (id) {
 	return company;
 }
 
-async function updateCompanyById (id, address, phone, zip, country, name, fax, info, oib) {
+async function updateCompanyById (id, address, phone, zip, country, companyName, fax, info, oib) {
 	return db.tx(async function (t) {
 		const queries = [];
 
@@ -63,7 +64,7 @@ async function updateCompanyById (id, address, phone, zip, country, name, fax, i
 		}, _.overSome([_.isUndefined, _.isNaN]));
 
 		const updateUserCompanyData = _.omitBy({
-			name,
+			name: companyName,
 			fax,
 			info,
 			oib,
@@ -78,13 +79,12 @@ async function updateCompanyById (id, address, phone, zip, country, name, fax, i
 
 		if (_.size(updateUserCompanyData)) {
 			queries.push({
-				query: helper.update(updateUserCompanyData, null, 'company') + `WHERE company.user_id = $[id] RETURNING id`,
+				query: helper.update(updateUserCompanyData, null, 'company') + ` WHERE user_id = $[id] RETURNING user_id`,
 				values: {id},
 			});
 		}
 		return t.many(helper.concat(queries));
 	})
-	.catch(error.QueryResultError, error('company.not_found'))
 	.catch(error.db('db.write'));
 }
 

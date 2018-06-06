@@ -22,4 +22,23 @@ router.get('/students/:id', validate('param', {id: joi.number().integer().positi
 	ctx.state.r = await studentRepo.getStudentById(id);
 });
 
+router.put('/students/:id', validate('param', { id: joi.number().integer().positive().required(),
+}), validate('body', {
+	address: joi.string().trim().optional(),
+	phone: joi.string().trim().optional(),
+	zip: joi.string().trim().optional(),
+	country: joi.string().trim().optional(),
+	firstName: joi.string().trim().optional(),
+	lastName: joi.string().trim().optional(),
+	cv: joi.string().trim().optional(),
+}), async function (ctx) {
+	const {id} = ctx.v.param;
+	console.log(id);
+	console.log(ctx.v);
+	const {address, phone, zip, country, firstName, lastName, cv} = ctx.v.body;
+
+	await studentRepo.updateStudentById(id, address, phone, zip, country, firstName, lastName, cv);
+	ctx.state.r = await studentRepo.getStudentById(id);
+});
+
 module.exports = router;

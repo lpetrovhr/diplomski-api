@@ -23,19 +23,55 @@ async function checkPassword (password, hash) {
 	.catch(error.AssertionError, error('user.password_wrong'));
 }
 
-async function create (email, password, firstName, lastName) {
+async function createStudent (email, password, role, address, zipCode, countryCode, firstName, lastName) {
 	return db.tx(async function (t) {
 		return t.none(`
       INSERT INTO
-        "user" (email, password)
-        VALUES ($[email], $[password]);
+        "user" (email, password, address, zip_code, country_code)
+        VALUES ($[email], $[password], $[address], $[zip_code], $[country_code]);
       INSERT INTO
         user_role (user_id, role)
-        VALUES (currval('user_id_seq'), $[role])
+        VALUES (currval('user_id_seq'), $[role]);
+      INSERT INTO 
+         student (user_id, first_name, last_name)
+         VALUES(currval('user_id_seq'), $[firstName], $[lastName]);
     `, {
 			email,
 			password: password ? await hashPassword(password) : '',
-			role: consts.roleUser.none,
+			role,
+			address,
+			zip_code: zipCode,
+			country_code: countryCode,
+			firstName,
+			lastName,
+		})
+		.catch({constraint: 'user_email_key'}, error('user.duplicate'));
+	})
+	.catch(error.db('db.write'));
+}
+
+async function createCompany (email, password, role, address, zipCode, countryCode, companyName, oib, info) {
+	return db.tx(async function (t) {
+		return t.none(`
+      INSERT INTO
+        "user" (email, password, address, zip_code, country_code)
+        VALUES ($[email], $[password], $[address], $[zip_code], $[country_code]);
+      INSERT INTO
+        user_role (user_id, role)
+        VALUES (currval('user_id_seq'), $[role]);
+      INSERT INTO
+        company (user_id, name, oib, info)
+        VALUES (currval('user_id_seq'), $[name], $[oib], $[info]);
+    `, {
+			email,
+			password: password ? await hashPassword(password) : '',
+			role,
+			address,
+			zip_code: zipCode,
+			country_code: countryCode,
+			name: companyName,
+			oib,
+			info,
 		})
 		.catch({constraint: 'user_email_key'}, error('user.duplicate'));
 	})
@@ -75,7 +111,7 @@ async function getByEmail (email) {
 
 async function getByEmailPassword (email, password) {
 	const user = await db.one(`
-    SELECT id, password
+    SELECT id, password, email
     FROM "user"
     WHERE email = $1
   `, [email])
@@ -123,8 +159,17 @@ async function removeUserCategoryById (user_id, category_id) {
 	.catch(error.db('db.delete'));
 }
 
+// async function addUserTagById (user_id, tag_id) {
+//
+// }
+//
+// async function removeUserTagById (user_id, tag_id) {
+//
+// }
+
 module.exports = {
-	create,
+	createStudent,
+	createCompany,
 	getByEmail,
 	getByEmailPassword,
 	getById,

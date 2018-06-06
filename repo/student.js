@@ -1,6 +1,7 @@
+const _ = require('lodash');
 const consts = require('const');
 const error = require('error');
-const {db} = require('db');
+const {db, helper} = require('db');
 
 const {mapper} = require('repo/base');
 
@@ -47,14 +48,49 @@ async function getStudentById (id) {
 	student.tags = await tagsRepo.getUserTagsById(student.id);
 	student.socialLinks = await socialRepo.getUserSocialLinksById(student.id);
 
-	return student;
+	return [student];
 }
 
-async function editStudent () {
+async function updateStudentById (id, address, phone, zip, country, firstName, lastName, cv) {
+	return db.tx(async function (t) {
+		const queries = [];
+
+		const updateUserData = _.omitBy({
+			address,
+			phone,
+			zip_code: zip,
+			country_code: country,
+		}, _.overSome([_.isUndefined, _.isNaN]));
+
+		const updateStudentData = _.omitBy({
+			first_name: firstName,
+			last_name: lastName,
+			cv_link: cv,
+		}, _.overSome([_.isUndefined, _.isNaN]));
+
+		if (_.size(updateUserData)) {
+			queries.push({
+				query: helper.update(updateUserData, null, 'user') + ` WHERE id = $[id] RETURNING id`,
+				values: {id},
+			});
+		}
+
+		if (_.size(updateStudentData)) {
+			queries.push({
+				query: helper.update(updateStudentData, null, 'student') + ` WHERE user_id = $[id] RETURNING user_id`,
+				values: {id},
+			});
+		}
+
+		console.log(queries);
+		return t.many(helper.concat(queries));
+	})
+	.catch(error.db('db.write'));
 }
 
 module.exports = {
 	getAllStudents,
 	getStudentById,
+	updateStudentById,
 	map,
 };

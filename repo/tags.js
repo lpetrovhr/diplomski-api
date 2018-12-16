@@ -1,8 +1,8 @@
-const consts = require('const');
-const error = require('error');
-const {db, helper} = require('db');
+const consts = require('../const');
+const error = require('../error');
+const { db, helper } = require('../db');
 
-const {mapper} = require('repo/base');
+const { mapper } = require('../repo/base');
 
 const map = mapper({
 	tagId: 'id',

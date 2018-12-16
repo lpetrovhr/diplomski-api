@@ -2,11 +2,11 @@ const _ = require('lodash');
 const joi = require('joi');
 const router = new (require('koa-router'))();
 
-const consts = require('const');
-const responder = require('middleware/responder');
-const categoryRepo = require('repo/category');
-const socialRepo = require('repo/social');
-const validate = require('middleware/validate');
+const consts = require('../const');
+const responder = require('../middleware/responder');
+const categoryRepo = require('../repo/category');
+const socialRepo = require('../repo/social');
+const validate = require('../middleware/validate');
 
 router.use(responder);
 

@@ -1,9 +1,9 @@
-const consts = require('const');
+const consts = require('../const');
 const _ = require('lodash');
-const error = require('error');
-const {db, helper} = require('db');
+const error = require('../error');
+const { db, helper } = require('../db');
 
-const {mapper} = require('repo/base');
+const { mapper } = require('../repo/base');
 
 const map = mapper({
 	id: 'id',

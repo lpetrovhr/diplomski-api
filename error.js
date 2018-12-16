@@ -3,7 +3,7 @@ const _ = require('lodash');
 const assert = require('assert');
 const pgp = require('pg-promise');
 
-const errors = require('error.toml');
+const errors = require('./error.toml');
 
 class GenericError extends NestedError {
 	constructor (ec, cause, status) {

@@ -1,15 +1,15 @@
 const _ = require('lodash');
 const assert = require('assert');
 
-const consts = require('const');
-const error = require('error');
-const {db, helper} = require('db');
-const {mapper} = require('repo/base');
+// const consts = require('../const');
+const error = require('../error');
+const { db, helper } = require('../db');
+const { mapper } = require('../repo/base');
 
 // repos
-const categoryRepo = require('repo/category');
-const tagsRepo = require('repo/tags');
-const socialRepo = require('repo/social');
+const categoryRepo = require('../repo/category');
+const tagsRepo = require('../repo/tags');
+const socialRepo = require('../repo/social');
 
 const map = mapper({
 	id: 'user_id',

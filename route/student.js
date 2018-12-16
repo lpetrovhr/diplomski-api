@@ -3,13 +3,13 @@ const joi = require('joi');
 const jwt = require('jsonwebtoken');
 const router = new (require('koa-router'))();
 
-const auth = require('middleware/auth');
-const consts = require('const');
-const passwordTokenRepo = require('repo/passwordToken');
-const responder = require('middleware/responder');
-const studentRepo = require('repo/student');
-const userRepo = require('repo/user');
-const validate = require('middleware/validate');
+const auth = require('../middleware/auth');
+const consts = require('../const');
+const passwordTokenRepo = require('../repo/passwordToken');
+const responder = require('../middleware/responder');
+const studentRepo = require('../repo/student');
+const userRepo = require('../repo/user');
+const validate = require('../middleware/validate');
 
 router.use(responder);
 

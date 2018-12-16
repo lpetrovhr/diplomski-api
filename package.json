@@ -66,6 +66,7 @@
     "npm": "5"
   },
   "scripts": {
+    "start": "node index.js",
     "lint:check": "eslint .",
     "lint:fix": "eslint --fix .",
     "migrate": "node -r babel-register -r ./env migrate",
@@ -77,6 +78,5 @@
     "ci": "run-s -s lint:check db:recreate db:seed test",
     "snyk-protect": "snyk protect",
     "prepare": "npm run snyk-protect"
-  },
-  "snyk": true
+  }
 }

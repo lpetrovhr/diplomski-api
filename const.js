@@ -1,1 +1,1 @@
-module.exports = require('const.toml')
+module.exports = require('./const.toml')

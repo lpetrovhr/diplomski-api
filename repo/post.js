@@ -1,9 +1,9 @@
 const _ = require('lodash');
-const error = require('error');
-const {db, helper} = require('db');
-const {mapper} = require('repo/base');
+const error = require('../error');
+const { db, helper } = require('../db');
+const { mapper } = require('../repo/base');
 
-const categoryRepo = require('repo/category');
+const categoryRepo = require('../repo/category');
 
 const map = mapper({
 	id: 'post_id',

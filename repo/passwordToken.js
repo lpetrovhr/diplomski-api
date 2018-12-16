@@ -1,9 +1,9 @@
 const _ = require('lodash');
 const randomString = require('crypto-random-string');
 
-const error = require('error');
-const userRepo = require('repo/user');
-const {db} = require('db');
+const error = require('../error');
+const userRepo = require('../repo/user');
+const { db } = require('../db');
 
 async function create (userId) {
 	const token = randomString(16);

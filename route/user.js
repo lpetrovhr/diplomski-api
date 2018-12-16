@@ -5,18 +5,18 @@ const jwt = require('jsonwebtoken');
 const router = new (require('koa-router'))();
 var koaBody = require('koa-body')({ multipart: true, formidable: { uploadDir: 'uploads', keepExtensions: true } });
 
-const auth = require('middleware/auth');
-const consts = require('const');
-const passwordTokenRepo = require('repo/passwordToken');
-const responder = require('middleware/responder');
-const roleUser = require('middleware/roleUser');
-const userRepo = require('repo/user');
-const studentRepo = require('repo/student');
-const companyRepo = require('repo/company');
-const socialRepo = require('repo/social');
-const tagsRepo = require('repo/tags');
-const validate = require('middleware/validate');
-const sendMail = require('middleware/mailer');
+const auth = require('../middleware/auth');
+const consts = require('../const');
+const passwordTokenRepo = require('../repo/passwordToken');
+const responder = require('../middleware/responder');
+const roleUser = require('../middleware/roleUser');
+const userRepo = require('../repo/user');
+const studentRepo = require('../repo/student');
+const companyRepo = require('../repo/company');
+const socialRepo = require('../repo/social');
+const tagsRepo = require('../repo/tags');
+const validate = require('../middleware/validate');
+const sendMail = require('../middleware/mailer');
 
 router.use(responder);
 

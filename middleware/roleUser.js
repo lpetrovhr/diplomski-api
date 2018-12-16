@@ -1,7 +1,7 @@
 const _ = require('lodash');
 
-const error = require('error');
-const userRepo = require('repo/user');
+const error = require('./error');
+const userRepo = require('../repo/user');
 
 const check = fn => roleOrPath => async (ctx, next) => {
 	const role = _.isString(roleOrPath) ? _.get(ctx, roleOrPath) : roleOrPath;

@@ -1,7 +1,7 @@
 const _ = require('lodash');
 const joi = require('joi');
 
-const error = require('error');
+const error = require('./error');
 
 const defaults = {
 	abortEarly: false,

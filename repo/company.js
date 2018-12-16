@@ -52,14 +52,14 @@ async function getCompanyById (id) {
 	return company;
 }
 
-async function updateCompanyById (id, address, phone, zip, country, companyName, fax, info, oib) {
+async function updateCompanyById (id, address, phone, zipCode, country, companyName, fax, info, oib) {
 	return db.tx(async function (t) {
 		const queries = [];
 
 		const updateUserData = _.omitBy({
 			address,
 			phone,
-			zip_code: zip,
+			zip_code: zipCode,
 			country_code: country,
 		}, _.overSome([_.isUndefined, _.isNaN]));
 

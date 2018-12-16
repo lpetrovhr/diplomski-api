@@ -20,8 +20,8 @@ const map = mapper({
 const simplePostMapper = mapper({
 	id: 'post_id',
 	postInfo: 'post_info',
-	postTypeId: 'post_type_id',
-	postTypeName: 'post_type_name',
+	typeId: 'post_type_id',
+	typeName: 'post_type_name',
 	startDate: 'start_date',
 	endDate: 'end_date',
 });
@@ -31,9 +31,17 @@ const postTypeMapper = mapper({
 	name: 'name',
 });
 
+async function getAllPostTypes () {
+	return await db.any(`
+	SELECT *
+	FROM post_type`)
+	.catch(error.db('db.read'))
+	.map(postTypeMapper);
+}
+
 async function getAllPosts () {
 	return await db.any(`
-		SELECT post.id AS post_id, post.info AS post_info, company.user_id AS company_id, company.name AS company_name, post_type.id AS post_type_id, post_type.name AS post_type_name, "user".image_fname AS company_image
+		SELECT post.id AS post_id, post.info AS post_info, company.user_id AS company_id, company.name AS company_name, post_type.id AS post_type_id, post_type.name AS post_type_name, "user".image_fname AS company_image, start_date, end_date
 		FROM post, company, post_type, "user"
 		WHERE post.company_id = company.user_id AND post.type_id = post_type.id AND company.user_id = "user".id`)
 	.catch(error.db('db.read'))
@@ -50,7 +58,10 @@ async function getPostById (id) {
 	.catch(error.db('db.read'))
 	.then(map);
 
-	post.categories = await categoryRepo.getPostCategoriesById(post.id);
+	const categories = await categoryRepo.getPostCategoriesById(post.id);
+  if (categories.length) {
+    post.categoryId = categories[0].id;
+  }
 
 	return post;
 }
@@ -68,30 +79,18 @@ async function getPostsByUserId (id) {
 	return posts;
 }
 
-async function createNewPost (companyId, typeId, info, startDate, endDate, categories) {
+async function createNewPost (companyId, typeId, info, startDate, endDate) {
 	return db.tx(async function (t) {
 		const queries = [];
 
-	  queries.push({
+		queries.push({
 			query: `INSERT INTO 
-        post (company_id, type_id, info, start_date, end_date)
-        VALUES ($[companyId], $[typeId], $[info], $[startDate], $[endDate])
-        RETURNING id
-      `,
+			post (company_id, type_id, info, start_date, end_date)
+			VALUES ($[companyId], $[typeId], $[info], $[startDate], $[endDate])
+			RETURNING id
+		`,
 			values: { companyId, typeId, info, startDate, endDate },
 		});
-
-		if (categories) {
-			_.forEach(categories, function (category) {
-	      queries.push({
-					query: `INSERT INTO post_category (post_id, category_id)
-                  VALUES (currval('post_id_seq'), $[category])
-                  RETURNING currval('post_id_seq')
-                  `,
-					values: { category },
-				});
-			});
-		}
 
 		return t.one(helper.concat(queries));
 	})
@@ -134,12 +133,12 @@ async function addPostCategory (postId, categoryId) {
 	.catch(error.db('db.write'));
 }
 
-async function removePostCategory (postId, categoryId) {
+async function removePostCategories (postId) {
 	return db.none(`
     DELETE
     FROM post_category
-    WHERE post_id = $[postId] AND category_id = $[categoryId]
-  `, {postId, categoryId})
+    WHERE post_id = $[postId]
+  `, {postId})
 	.catch(error('db.delete'));
 }
 
@@ -148,9 +147,10 @@ module.exports = {
 	getAllPosts,
 	getPostById,
 	getPostsByUserId,
+	getAllPostTypes,
 	updatePostById,
 	addPostCategory,
-	removePostCategory,
+	removePostCategories,
 	map,
 	simplePostMapper,
 };

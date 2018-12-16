@@ -6,9 +6,26 @@ const {db, helper} = require('db');
 const {mapper} = require('repo/base');
 
 const map = mapper({
-	socialName: 'name',
-	socialLink: 'link',
+	id: 'id',
+	name: 'name',
+	link: 'link',
 });
+
+const simpleMapper = mapper({
+	id: 'id',
+	name: 'name',
+});
+
+async function getSocialCategories () {
+	const social = await db.any(`
+    SELECT *
+    FROM social
+  `)
+	.map(simpleMapper)
+	.catch(error.db('db.read'));
+
+	return social;
+}
 
 async function getUserSocialLinksById (id) {
 	const social = await db.any(`
@@ -56,13 +73,12 @@ async function updateUserSocialById (userId, socialId, link) {
 	.catch(error.db('db.write'));
 }
 
-async function removeUserSocial (userId, socialId) {
+async function removeUserSocial (userId) {
 	return db.none(`
-    DELETE
-    FROM user_social
+    DELETE 
+    FROM "user_social"
     WHERE user_id = $[userId]
-    AND social_id = $[socialId]
-  `, {userId, socialId})
+  `, {userId})
 	.catch(error('db.delete'));
 }
 
@@ -71,4 +87,5 @@ module.exports = {
 	addUserSocial,
 	removeUserSocial,
 	updateUserSocialById,
+	getSocialCategories,
 };

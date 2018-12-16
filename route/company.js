@@ -8,6 +8,7 @@ const consts = require('const');
 const passwordTokenRepo = require('repo/passwordToken');
 const responder = require('middleware/responder');
 const companyRepo = require('repo/company');
+const userRepo = require('repo/user');
 const validate = require('middleware/validate');
 
 router.use(responder);
@@ -22,23 +23,29 @@ router.get('/companies/:id', validate('param', { id: joi.number().integer().posi
 	ctx.state.r = await companyRepo.getCompanyById(id);
 });
 
-router.put('/companies/:id', validate('param', { id: joi.number().integer().positive().required(),
+router.put('/companies/:id', auth, validate('param', { id: joi.number().integer().positive().required(),
 }), validate('body', {
+	email: joi.string().email().optional(),
 	address: joi.string().trim().optional(),
 	phone: joi.string().trim().optional(),
-	zip: joi.string().trim().optional(),
+	zipCode: joi.number().integer().positive().optional(),
 	country: joi.string().trim().optional(),
 	companyName: joi.string().trim().optional(),
 	fax: joi.string().trim().optional(),
-	companyInfo: joi.string().trim().optional(),
+	info: joi.string().trim().optional(),
 	oib: joi.number().integer().positive().optional(),
+	categoryId: joi.number().integer().positive(),
 }), async function (ctx) {
 	const {id} = ctx.v.param;
-	console.log(id);
-	console.log(ctx.v);
-	const {address, phone, zip, country, companyName, fax, companyInfo, oib} = ctx.v.body;
+	const {address, phone, zipCode, country, companyName, fax, info, oib, categoryId} = ctx.v.body;
 
-	await companyRepo.updateCompanyById(id, address, phone, zip, country, companyName, fax, companyInfo, oib);
+	await companyRepo.updateCompanyById(id, address, phone, zipCode, country, companyName, fax, info, oib);
+
+	if (categoryId) {
+		await userRepo.removeUserCategoryById(id);
+		await userRepo.addUserCategoryById(id, categoryId);
+	}
+
 	ctx.state.r = await companyRepo.getCompanyById(id);
 });
 

@@ -1,21 +1,21 @@
 -- social
 INSERT INTO
-  social (id, name)
+  social (name)
   VALUES
-  (1, 'Facebook'),
-  (2, 'Twitter'),
-  (3, 'Github'),
-  (4, 'Instagram');
+  ('Facebook'),
+  ('Twitter'),
+  ('Github'),
+  ('Instagram');
 
 -- categories
 INSERT INTO
-  category (id, name)
-  VALUES (1 ,'Informacijska Tehnologija'), (2 ,'Ekonomija'), (3 ,'Racunovodstvo'), (4, 'Elektrotehnika'), (5 ,'Strojarstvo');
+  category (name)
+  VALUES ('Opća obavijest'), ('Informacijska Tehnologija'), ('Ekonomija'), ('Racunovodstvo'), ('Elektrotehnika'), ('Strojarstvo');
 
 -- post type
 INSERT INTO
-  post_type (id ,name)
-  VALUES (1, 'Posao'), (2, 'Praksa'), (3, 'Radionica'), (4, 'Predavanje'), (5, 'Obavijest');
+  post_type (name)
+  VALUES ('Posao'), ('Praksa'), ('Radionica'), ('Predavanje'), ('Obavijest');
 
 -- superadmin@mail.com/superadmin
 INSERT INTO
@@ -32,16 +32,16 @@ INSERT INTO
 INSERT INTO
   user_role (user_id, role)
   VALUES (currval('user_id_seq'), 0);
-INSERT INTO 
+INSERT INTO
   student (user_id, first_name, last_name, cv_link)
   VALUES (currval('user_id_seq'), 'Leon', 'Petrov', 'nekakav_link_dotcom');
 INSERT INTO
   user_category (user_id, category_id)
-  VALUES 
+  VALUES
   (currval('user_id_seq'), 1),
   (currval('user_id_seq'), 2);
 
-  
+
 -- student2@mail.com/student2
 INSERT INTO
   "user" (email, password, address, phone, zip_code, country_code)
@@ -76,7 +76,7 @@ INSERT INTO
   VALUES (currval('user_id_seq'), 'AwesomeIng', 12534456521, 'Block development company with funny name');
 INSERT INTO
   post (company_id, type_id, info)
-  VALUES 
+  VALUES
   (currval('user_id_seq'), 5,  'Dragi studenti, ovim putem vas obavijestavamo da u subotu 13.8.2017. imamo dane otvorenih vrata te vas pozivamo da nam se pridruzite u sto vecem broju');
 INSERT INTO
   post_category (post_id, category_id)
@@ -96,7 +96,7 @@ INSERT INTO
   VALUES (currval('user_id_seq'), 'FiveRow', 44557753236, 'Greates company of them all, looking for awesome new hire');
 INSERT INTO
   post (company_id, type_id, info)
-  VALUES 
+  VALUES
   (currval('user_id_seq'), 2, 'Trazimo studenta za obavljanje strucne prakse'),
   (currval('user_id_seq'), 4, 'U petak 22.5.2018. drzimo predavanje na temu asinkronih funkcija u JavaScript-u');
 INSERT INTO

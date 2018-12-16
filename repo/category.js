@@ -6,14 +6,22 @@ const {db, helper} = require('db');
 const {mapper} = require('repo/base');
 
 const map = mapper({
-	categoryId: 'id',
-	categoryName: 'name',
+	id: 'id',
+	name: 'name',
 });
 
 async function getAllCategories () {
-	return await db.any(`
-		SELECT *
-		FROM category`)
+	return db.any(`
+	SELECT *
+	FROM category`)
+	.catch(error.db('db.read'))
+	.map(map);
+}
+
+async function getAllTags () {
+	return db.any(`
+	SELECT *
+	FROM tags`)
 	.catch(error.db('db.read'))
 	.map(map);
 }
@@ -93,4 +101,5 @@ module.exports = {
 	updateCategory,
 	getAllCategories,
 	deleteCategory,
+	getAllTags,
 };

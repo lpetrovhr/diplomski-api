@@ -9,6 +9,7 @@
     "url": "https://github.com/lpetrovhr/diplomski-api.git"
   },
   "dependencies": {
+    "aws-sdk": "^2.377.0",
     "babel-cli": "^6.24.1",
     "babel-plugin-module-resolver": "^2.7.1",
     "babel-plugin-transform-object-rest-spread": "^6.23.0",

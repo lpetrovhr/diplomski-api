@@ -1,9 +1,8 @@
 const _ = require('lodash');
 const joi = require('joi');
-const path = require('path');
 const jwt = require('jsonwebtoken');
 const router = new (require('koa-router'))();
-var koaBody = require('koa-body')({ multipart: true, formidable: { uploadDir: 'uploads', keepExtensions: true } });
+var koaBody = require('koa-body')({ multipart: true });
 
 const auth = require('../middleware/auth');
 const consts = require('../const');
@@ -196,9 +195,8 @@ router.post('/user/:id/upload', koaBody, validate('param', {
 	id: joi.number().integer().required(),
 }), async function (ctx) {
 	const { id } = ctx.v.param;
-	const imagePath = ctx.request.files.image.path;
-	console.log(imagePath);
-	await userRepo.imageUpload(id, imagePath);
+	const file = ctx.request.files.image;
+	await userRepo.imageUpload(id, file);
 	ctx.state.r = {};
 });
 

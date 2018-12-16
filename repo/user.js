@@ -1,6 +1,8 @@
 const _ = require('lodash');
 const assert = require('assert');
 const bcrypt = require('bcrypt');
+const aws = require('aws-sdk');
+const fs = require('fs');
 
 const consts = require('../const');
 const error = require('../error');
@@ -177,12 +179,51 @@ async function userActiveStateUpdate (userId, state) {
 	.catch(error.db('db.write'));
 }
 
-async function imageUpload (userId, imagePath) {
+async function imageUpload (userId, file) {
+	const { key, url } = await new Promise((resolve, reject) => {
+		aws.config.update({
+			region: 'us-west-2',
+			accessKeyId: `${process.env.AWS_ACCESS_KEY_ID}`,
+			secretAccessKey: `${process.env.AWS_SECRET_ACCESS_KEY}`,
+		});
+
+		const s3 = new aws.S3({
+			apiVersion: '2018-12-16',
+			// If you want to specify a different endpoint, such as using DigitalOcean spaces
+			// endpoint: new aws.Endpoint("nyc3.digitaloceanspaces.com"),
+		});
+
+		const stream = fs.createReadStream(file.path);
+		stream.on('error', function (err) {
+			reject(err);
+		});
+
+		s3.upload(
+		{
+			ACL: 'public-read',
+			// You'll input your bucket name here
+			Bucket: 'student-cv-api-assets',
+			Body: stream,
+			Key: file.name,
+			ContentType: file.type,
+		},
+		function (err, data) {
+			if (err) {
+				reject(err);
+			} else if (data) {
+				resolve({ key: data.Key, url: data.Location });
+			}
+		}
+		);
+	});
+
+	console.log(url);
+
 	return db.none(`
 		UPDATE "user"
 		SET image_fname = $2
 		WHERE id = $1
-	`, [userId, imagePath])
+	`, [userId, url])
 	.catch(error.db('db.write'));
 }
 

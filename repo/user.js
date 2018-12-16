@@ -11,6 +11,8 @@ const map = mapper({
 	id: 'id',
 	createdAt: 'created_at',
 	email: 'email',
+	role: 'role',
+	active: 'active',
 });
 
 async function hashPassword (password) {
@@ -23,12 +25,12 @@ async function checkPassword (password, hash) {
 	.catch(error.AssertionError, error('user.password_wrong'));
 }
 
-async function createStudent (email, password, role, address, zipCode, countryCode, firstName, lastName) {
+async function createStudent (email, password, role, firstName, lastName) {
 	return db.tx(async function (t) {
 		return t.none(`
       INSERT INTO
-        "user" (email, password, address, zip_code, country_code)
-        VALUES ($[email], $[password], $[address], $[zip_code], $[country_code]);
+        "user" (email, password)
+        VALUES ($[email], $[password]);
       INSERT INTO
         user_role (user_id, role)
         VALUES (currval('user_id_seq'), $[role]);
@@ -39,9 +41,6 @@ async function createStudent (email, password, role, address, zipCode, countryCo
 			email,
 			password: password ? await hashPassword(password) : '',
 			role,
-			address,
-			zip_code: zipCode,
-			country_code: countryCode,
 			firstName,
 			lastName,
 		})
@@ -50,28 +49,28 @@ async function createStudent (email, password, role, address, zipCode, countryCo
 	.catch(error.db('db.write'));
 }
 
-async function createCompany (email, password, role, address, zipCode, countryCode, companyName, oib, info) {
+async function createCompany (email, password, address, zipCode, companyName, oib, info, phone) {
 	return db.tx(async function (t) {
 		return t.none(`
       INSERT INTO
-        "user" (email, password, address, zip_code, country_code)
-        VALUES ($[email], $[password], $[address], $[zip_code], $[country_code]);
+        "user" (email, password, address, zip_code, country_code, phone, active)
+        VALUES ($[email], $[password], $[address], $[zip_code], 'HR', $[phone], false);
       INSERT INTO
         user_role (user_id, role)
-        VALUES (currval('user_id_seq'), $[role]);
+        VALUES (currval('user_id_seq'), 10);
       INSERT INTO
         company (user_id, name, oib, info)
         VALUES (currval('user_id_seq'), $[name], $[oib], $[info]);
     `, {
 			email,
 			password: password ? await hashPassword(password) : '',
-			role,
 			address,
 			zip_code: zipCode,
-			country_code: countryCode,
 			name: companyName,
 			oib,
 			info,
+			phone,
+			active: false,
 		})
 		.catch({constraint: 'user_email_key'}, error('user.duplicate'));
 	})
@@ -87,21 +86,32 @@ async function updatePassword (id, password) {
 	.catch(error.db('db.update'));
 }
 
+async function getAllUsers () {
+	return db.any(`
+    SELECT *
+    FROM "user"
+    INNER JOIN "user_role" ON ("user_role".user_id = "user".id)`)
+	.catch(error.db('db.read'))
+	.map(map);
+}
+
 async function getById (id) {
 	return db.one(`
     SELECT *
     FROM "user"
+    INNER JOIN "user_role" ON ("user_role".user_id = "user".id)
     WHERE id = $1
   `, [id])
-	.then(map)
 	.catch(error.QueryResultError, error('user.not_found'))
-	.catch(error.db('db.read'));
+	.catch(error.db('db.read'))
+	.then(map);
 }
 
 async function getByEmail (email) {
 	return db.one(`
     SELECT *
-    FROM "user"
+		FROM "user"
+		INNER JOIN "user_role" ON ("user_role".user_id = "user".id)
     WHERE email = $1
   `, [email])
 	.catch(error.QueryResultError, error('user.not_found'))
@@ -111,11 +121,11 @@ async function getByEmail (email) {
 
 async function getByEmailPassword (email, password) {
 	const user = await db.one(`
-    SELECT id, password, email
+    SELECT id, password, email, role
     FROM "user"
+    INNER JOIN "user_role" ON ("user_role".user_id = "user".id)
     WHERE email = $1
   `, [email])
-	.catch(error.QueryResultError, error('user.password_wrong'))
 	.catch(error.db('db.read'));
 	await checkPassword(password, user.password);
 	return map(user);
@@ -137,7 +147,7 @@ async function setRoleById (id, role) {
     UPDATE user_role
     SET role = $[role]
     WHERE user_id = $[id]
-  `, {id, role})
+  `, [id, role])
 	.catch({constraint: 'user_role_user_id_fkey'}, error.db('user.not_found'))
 	.catch(error.db('db.write'));
 }
@@ -150,22 +160,31 @@ async function addUserCategoryById (user_id, category_id) {
 	.catch(error.db('db.write'));
 }
 
-async function removeUserCategoryById (user_id, category_id) {
+async function removeUserCategoryById (user_id) {
 	return db.none(`
 		DELETE FROM user_category
 		WHERE user_id = $[user_id]
-		AND category_id = $[category_id]
-	`, {user_id, category_id})
+	`, {user_id})
 	.catch(error.db('db.delete'));
 }
 
-// async function addUserTagById (user_id, tag_id) {
-//
-// }
-//
-// async function removeUserTagById (user_id, tag_id) {
-//
-// }
+async function userActiveStateUpdate (userId, state) {
+	return db.none(`
+    UPDATE "user"
+    SET active = $2
+    WHERE id = $1
+  `, [userId, state])
+	.catch(error.db('db.write'));
+}
+
+async function imageUpload (userId, imagePath) {
+	return db.none(`
+		UPDATE "user"
+		SET image_fname = $2
+		WHERE id = $1
+	`, [userId, imagePath])
+	.catch(error.db('db.write'));
+}
 
 module.exports = {
 	createStudent,
@@ -179,4 +198,7 @@ module.exports = {
 	updatePassword,
 	addUserCategoryById,
 	removeUserCategoryById,
+	getAllUsers,
+	userActiveStateUpdate,
+	imageUpload,
 };

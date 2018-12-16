@@ -10,7 +10,12 @@ const validate = require('middleware/validate');
 router.use(responder);
 
 router.get('/posts', async function (ctx) {
-	ctx.state.r = await postRepo.getAllPosts();
+	const postData = await postRepo.getAllPosts();
+	ctx.state.r = postData;
+});
+
+router.get('/posts/types', async function (ctx) {
+	ctx.state.r = await postRepo.getAllPostTypes();
 });
 
 router.get('/posts/:id', validate('param', {id: joi.number().integer().positive().required(),
@@ -25,33 +30,48 @@ router.get('/posts/user/:id', validate('param', {id: joi.number().integer().posi
 	ctx.state.r = await postRepo.getPostsByUserId(id);
 });
 
+router.get('/posts/type/:id', validate('param', {id: joi.number().integer().positive().required(),
+}), async function (ctx) {
+	const {id} = ctx.v.param;
+	ctx.state.r = await postRepo.getPostsByTypeId(id);
+});
+
 router.post('/posts', validate('body', {
-	companyId: joi.number().integer().positive(),
-	typeId: joi.number().integer().positive(),
-	info: joi.string().trim().optional(),
+	companyId: joi.number().integer().positive().required(),
+	typeId: joi.number().integer().positive().required(),
+	info: joi.string().trim().optional().required(),
 	startDate: joi.date().required(),
 	endDate: joi.date().required(),
-	categories: joi.array(),
+	categoryId: joi.number().integer().positive(),
 }), async function (ctx) {
-	const { companyId, typeId, info, startDate, endDate, categories } = ctx.v.body;
-	const id = await postRepo.createNewPost(companyId, typeId, info, startDate, endDate, categories);
+	const { companyId, typeId, info, startDate, endDate, categoryId } = ctx.v.body;
+	const categories = [];
+	categories.push(categoryId);
+
+	const id = await postRepo.createNewPost(companyId, typeId, info, startDate, endDate);
+	await postRepo.addPostCategory(id, categoryId);
 	ctx.state.r = await postRepo.getPostById(id);
 });
 
 router.put('/posts/:id', validate('param', {id: joi.number().integer().positive().required()}),
 validate('body', {
 	typeId: joi.number().integer().positive(),
-	info: joi.string().trim().optional(),
+	categoryId: joi.number().integer().positive(),
+	postInfo: joi.string().trim().optional(),
 	startDate: joi.date().optional(),
 	endDate: joi.date().optional(),
 }), async function (ctx) {
 	const {id} = ctx.v.param;
-	console.log(id);
-	console.log(ctx.v);
 
-	const {typeId, info, startDate, endDate} = ctx.v.body;
+	const {typeId, categoryId, postInfo, startDate, endDate} = ctx.v.body;
 
-	await postRepo.updatePostById(id, typeId, info, startDate, endDate);
+	await postRepo.updatePostById(id, typeId, postInfo, startDate, endDate);
+
+	if (categoryId) {
+	  await postRepo.removePostCategories(id);
+	  await postRepo.addPostCategory(id, categoryId);
+	}
+
 	ctx.state.r = await postRepo.getPostById(id);
 });
 

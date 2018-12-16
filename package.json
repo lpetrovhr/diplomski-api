@@ -77,7 +77,7 @@
     "ci": "run-s -s lint:check db:recreate db:seed test",
     "snyk-protect": "snyk protect",
     "prepare": "npm run snyk-protect",
-    "start": "run-p -s dev:server"
+    "start": "node index.js"
   },
   "snyk": true
 }

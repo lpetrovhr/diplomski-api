@@ -76,7 +76,8 @@
     "db:seed": "run-s -s \"migrate seed\"",
     "ci": "run-s -s lint:check db:recreate db:seed test",
     "snyk-protect": "snyk protect",
-    "prepare": "npm run snyk-protect"
+    "prepare": "npm run snyk-protect",
+    "start": "run-p -s dev:server"
   },
   "snyk": true
 }

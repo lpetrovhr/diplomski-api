@@ -32,7 +32,7 @@ const postTypeMapper = mapper({
 });
 
 async function getAllPostTypes () {
-	return await db.any(`
+	return db.any(`
 	SELECT *
 	FROM post_type`)
 	.catch(error.db('db.read'))
@@ -40,11 +40,23 @@ async function getAllPostTypes () {
 }
 
 async function getAllPosts () {
-	return await db.any(`
+	return db.any(`
 		SELECT post.id AS post_id, post.info AS post_info, company.user_id AS company_id, company.name AS company_name, post_type.id AS post_type_id, post_type.name AS post_type_name, "user".image_fname AS company_image, start_date, end_date
 		FROM post, company, post_type, "user"
 		WHERE post.company_id = company.user_id AND post.type_id = post_type.id AND company.user_id = "user".id`)
 	.catch(error.db('db.read'))
+	.map(map);
+}
+
+async function getAllPostsByType (typeId) {
+	return db.any(`
+	SELECT post.id AS post_id, post.info AS post_info, company.user_id AS company_id, company.name AS company_name, post_type.id AS post_type_id, post_type.name AS post_type_name, "user".image_fname AS company_image, start_date, end_date
+	FROM post
+	INNER JOIN company ON (post.company_id = company.user_id)
+	INNER JOIN post_type ON (post.type_id = post_type.id)
+	INNER JOIN "user" ON (company.user_id = "user".id)
+	WHERE post.type_id = $1
+	`, [typeId]).catch(error.db('db.read'))
 	.map(map);
 }
 
@@ -54,14 +66,13 @@ async function getPostById (id) {
 		FROM post, company, post_type, "user"
 		WHERE post.company_id = company.user_id AND post.type_id = post_type.id AND company.user_id = "user".id
 		AND post.id = $1`, [id])
-	.catch(error.QueryResultError, error('post.not_found'))
 	.catch(error.db('db.read'))
 	.then(map);
 
 	const categories = await categoryRepo.getPostCategoriesById(post.id);
-  if (categories.length) {
-    post.categoryId = categories[0].id;
-  }
+	if (categories.length) {
+		post.categoryId = categories[0].id;
+	}
 
 	return post;
 }
@@ -145,6 +156,7 @@ async function removePostCategories (postId) {
 module.exports = {
 	createNewPost,
 	getAllPosts,
+	getAllPostsByType,
 	getPostById,
 	getPostsByUserId,
 	getAllPostTypes,

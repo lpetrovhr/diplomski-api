@@ -14,6 +14,13 @@ router.get('/posts', async function (ctx) {
 	ctx.state.r = postData;
 });
 
+router.get('/posts/type/:id', validate('param', {
+	id: joi.number().integer().positive().required(),
+}), async function (ctx) {
+	const {id} = ctx.v.param;
+	ctx.state.r = await postRepo.getAllPostsByType(id);
+});
+
 router.get('/posts/types', async function (ctx) {
 	ctx.state.r = await postRepo.getAllPostTypes();
 });

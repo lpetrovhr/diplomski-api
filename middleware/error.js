@@ -1,6 +1,6 @@
 const _ = require('lodash');
 
-const error = require('./error');
+const error = require('../error');
 
 function wrap (err) {
 	if (err instanceof error.GenericError) {

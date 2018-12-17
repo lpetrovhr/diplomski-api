@@ -17,29 +17,38 @@ router.get('/companies', async function (ctx) {
 	ctx.state.r = await companyRepo.getAllCompanies();
 });
 
+router.get('/companies/search', async function (ctx) {
+	let companyName = ctx.query.name;
+	console.log(companyName);
+	let tag = ctx.query.tag;
+	let category = ctx.query.category;
+
+	ctx.state.r = await companyRepo.getAllCompaniesByParams(companyName, tag, category);
+});
+
 router.get('/companies/:id', validate('param', { id: joi.number().integer().positive().required(),
 }), async function (ctx) {
 	const {id} = ctx.v.param;
 	ctx.state.r = await companyRepo.getCompanyById(id);
 });
 
-router.put('/companies/:id', auth, validate('param', { id: joi.number().integer().positive().required(),
+router.put('/companies/:id', validate('param', { id: joi.number().integer().positive().required(),
 }), validate('body', {
 	email: joi.string().email().optional(),
 	address: joi.string().trim().optional(),
 	phone: joi.string().trim().optional(),
 	zipCode: joi.number().integer().positive().optional(),
-	country: joi.string().trim().optional(),
 	companyName: joi.string().trim().optional(),
 	fax: joi.string().trim().optional(),
 	info: joi.string().trim().optional(),
 	oib: joi.number().integer().positive().optional(),
 	categoryId: joi.number().integer().positive(),
 }), async function (ctx) {
+	console.log('put something here');
 	const {id} = ctx.v.param;
-	const {address, phone, zipCode, country, companyName, fax, info, oib, categoryId} = ctx.v.body;
+	const {address, phone, zipCode, companyName, fax, info, oib, categoryId} = ctx.v.body;
 
-	await companyRepo.updateCompanyById(id, address, phone, zipCode, country, companyName, fax, info, oib);
+	await companyRepo.updateCompanyById(id, address, phone, zipCode, companyName, fax, info, oib);
 
 	if (categoryId) {
 		await userRepo.removeUserCategoryById(id);

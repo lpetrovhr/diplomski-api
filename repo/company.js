@@ -35,6 +35,93 @@ async function getAllCompanies () {
 	.map(map);
 }
 
+async function getAllCompaniesByParams (companyName, tag, categoryId) {
+	console.log(companyName);
+	if (companyName === '' && tag === '' && categoryId === '') {
+		return db.any(`
+		SELECT * 
+		FROM "company" 
+		INNER JOIN "user" ON ("company".user_id = "user".id)
+		WHERE LOWER("company".name) LIKE LOWER('%${companyName}%')`)
+		.catch(error.db('db.read'))
+		.map(map);
+	} else if (categoryId && tag === '') {
+		return db.any(`
+		SELECT *
+		FROM "company"
+		INNER JOIN "user" ON ("company".user_id = "user".id)
+		LEFT JOIN "user_category" ON ("company".user_id = "user_category".user_id)
+		WHERE "user_category".category_id = ${categoryId}`)
+		.catch(error.db('db.read'))
+		.map(map);
+	} else if (tag) {
+		return db.any(`
+		SELECT *
+		FROM "company"
+		INNER JOIN "user" ON ("company".user_id = "user".id)
+		LEFT JOIN "user_tags" ON ("company".user_id = "user_tags".user_id)
+		LEFT JOIN "tags" ON ("user_tags".tags_id = "tags".id)
+		WHERE LOWER("tags".name) LIKE LOWER('%${tag}%')`)
+		.catch(error.db('db.read'))
+		.map(map);
+	} else if (categoryId && tag) {
+		return db.any(`
+		SELECT *
+		FROM "company"
+		INNER JOIN "user" ON ("company".user_id = "user".id)
+		LEFT JOIN "user_category" ON ("company".user_id = "user_category".user_id)
+		LEFT JOIN "user_tags" ON ("company".user_id = "user_tags".user_id)
+		LEFT JOIN "tags" ON ("user_tags".tags_id = "tags".id)
+		AND "user_category".category_id = ${categoryId}
+		AND LOWER("tags".name) LIKE LOWER('%${tag}%')`)
+		.catch(error.db('db.read'))
+		.map(map);
+	} else if (companyName && tag && categoryId) {
+		return db.any(`
+		SELECT *
+		FROM "company"
+		INNER JOIN "user" ON ("company".user_id = "user".id)
+		LEFT JOIN "user_category" ON ("company".user_id = "user_category".user_id)
+		LEFT JOIN "user_tags" ON ("company".user_id = "user_tags".user_id)
+		LEFT JOIN "tags" ON ("user_tags".tags_id = "tags".id)
+		WHERE LOWER("company".name) LIKE LOWER('%${companyName}%')
+		AND "user_category".category_id = ${categoryId}
+		AND LOWER("tags".name) LIKE LOWER('%${tag}%')`)
+		.catch(error.db('db.read'))
+		.map(map);
+	} else if (companyName && tag) {
+		return db.any(`
+		SELECT *
+		FROM "company"
+		INNER JOIN "user" ON ("company".user_id = "user".id)
+		LEFT JOIN "user_tags" ON ("company".user_id = "user_tags".user_id)
+		LEFT JOIN "tags" ON ("user_tags".tags_id = "tags".id)
+		WHERE LOWER("company".name) LIKE LOWER('%${companyName}%')
+		AND LOWER("tags".name) LIKE LOWER('%${tag}%')`)
+		.catch(error.db('db.read'))
+		.map(map);
+	} else if (companyName && categoryId) {
+		return db.any(`
+		SELECT *
+		FROM "company"
+		INNER JOIN "user" ON ("company".user_id = "user".id)
+		INNER JOIN "user_category" ON ("company".user_id = "user_category".user_id)
+		WHERE LOWER("company".name) LIKE LOWER('%${companyName}%')
+		AND "user_category".category_id = ${categoryId}`)
+		.catch(error.db('db.read'))
+		.map(map);
+	} else if (companyName !== '') {
+		return db.any(`
+		SELECT * 
+		FROM "company" 
+		INNER JOIN "user" ON ("company".user_id = "user".id)
+		WHERE LOWER("company".name) LIKE LOWER('%${companyName}%')`)
+		.catch(error.db('db.read'))
+		.map(map);
+	}
+	return getAllCompanies();
+}
+
 async function getCompanyById (id) {
 	const company = await db.one(`
 		SELECT * FROM "company"
@@ -90,6 +177,7 @@ async function updateCompanyById (id, address, phone, zipCode, country, companyN
 
 module.exports = {
 	getAllCompanies,
+	getAllCompaniesByParams,
 	getCompanyById,
 	updateCompanyById,
 	map,

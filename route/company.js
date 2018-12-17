@@ -17,6 +17,15 @@ router.get('/companies', async function (ctx) {
 	ctx.state.r = await companyRepo.getAllCompanies();
 });
 
+router.get('/companies/search', async function (ctx) {
+	let companyName = ctx.query.name;
+	console.log(companyName);
+	let tag = ctx.query.tag;
+	let category = ctx.query.category;
+
+	ctx.state.r = await companyRepo.getAllCompaniesByParams(companyName, tag, category);
+});
+
 router.get('/companies/:id', validate('param', { id: joi.number().integer().positive().required(),
 }), async function (ctx) {
 	const {id} = ctx.v.param;
